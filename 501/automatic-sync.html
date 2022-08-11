@@ -97,14 +97,27 @@
             Moralis.start({ serverUrl, appId })
 
 
-            // <!-- Basic Functions -->
+            /* Authentication code */
             async function login() {
-                await Moralis.authenticate();
+                let user = Moralis.User.current();
+                if (!user) {
+                    user = await Moralis.authenticate({
+                        signingMessage: "Log in using Moralis",
+                    })
+                        .then(function (user) {
+                            console.log("logged in user:", user);
+                            console.log(user.get("ethAddress"));
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                }
                 checkUser();
             }
 
-            async function logout() {
+            async function logOut() {
                 await Moralis.User.logOut();
+                console.log("logged out");
                 checkUser();
             }
 
@@ -165,7 +178,7 @@
 
             // BUTTON CLICK LISTENERS
             document.getElementById("login_button").onclick = login;
-            document.getElementById("logout_button").onclick = logout;
+            document.getElementById("logout_button").onclick = logOut;
             document.getElementById("btn-runImportAddress").onclick = runImportAddress;
             document.getElementById("btn-destroyAddress").onclick = destroyAddress;
             document.getElementById("btn-getAddresses").onclick = getAddresses;
